@@ -15,9 +15,9 @@ class SeikoSpider(scrapy.Spider):
     def start_requests(self):
         urls = [
             'https://www.seikowatches.com/fr-fr/products/lukia/lineup',
-            # 'https://www.seikowatches.com/fr-fr/products/prospex/lineup',
-            # 'https://www.seikowatches.com/fr-fr/products/presage/lineup',
-            # 'https://www.seikowatches.com/fr-fr/products/5sports/lineup'
+            'https://www.seikowatches.com/fr-fr/products/prospex/lineup',
+            'https://www.seikowatches.com/fr-fr/products/presage/lineup',
+            'https://www.seikowatches.com/fr-fr/products/5sports/lineup'
         ]
 
         Logger.info('Seiko spider')
