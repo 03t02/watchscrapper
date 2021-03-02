@@ -1,9 +1,12 @@
 import scrapy
 from watchesScrapper.src.logger import Logger
-from watchesScrapper.src.utils import generate_default_dict, price_to_int
+from watchesScrapper.src.utils import generate_default_dict, price_to_int \
+    ,format_key
 from watchesScrapper.src.watch_specs import WatchSpecs
-from watchesScrapper.src.constant import HOURS_MINUTES, DATE, DAY, DAY_DATE, \
-    ALARM, CHRONOGRAPH, SECOND_TIMEZONE, AUTOMATIC, SOLAR
+from watchesScrapper.src.constant import HOURS_MINUTES, DATE, DAY, DAY_DATE \
+    ,ALARM, CHRONOGRAPH, SECOND_TIMEZONE, AUTOMATIC, SOLAR, MALE, FEMALE \
+    ,SAPHIR, STAINLESS_STEEL, HARDLEX, CORDOVAN_LEATHER, CROCODILE_LEATHER\
+    ,POWER_RESERVE
 
 
 class SeikoSpider(scrapy.Spider):
@@ -12,9 +15,9 @@ class SeikoSpider(scrapy.Spider):
     def start_requests(self):
         urls = [
             'https://www.seikowatches.com/fr-fr/products/lukia/lineup',
-            'https://www.seikowatches.com/fr-fr/products/prospex/lineup',
-            'https://www.seikowatches.com/fr-fr/products/presage/lineup',
-            'https://www.seikowatches.com/fr-fr/products/5sports/lineup'
+            # 'https://www.seikowatches.com/fr-fr/products/prospex/lineup',
+            # 'https://www.seikowatches.com/fr-fr/products/presage/lineup',
+            # 'https://www.seikowatches.com/fr-fr/products/5sports/lineup'
         ]
 
         Logger.info('Seiko spider')
@@ -37,7 +40,7 @@ class SeikoSpider(scrapy.Spider):
             infos.name = name
             infos.reference = reference
             infos.price = price_to_int(price)
-            infos.gender = gender
+            infos.gender = self.translate_gender(gender)
             infos.url = link
 
             yield scrapy.Request(link, callback=self.parse_detail, meta={'item': infos})
@@ -46,60 +49,85 @@ class SeikoSpider(scrapy.Spider):
         infos = response.meta['item']
         image = response.css('.okra-carousel-slide-inner img::attr(src)').get()
         spec_groups = response.css('.pr-Spec_Group')
-        movement = spec_groups[0]
-        materials = spec_groups[1]
-        diameter = spec_groups[2]
+
+        movement = self.spec_group_to_dict(spec_groups[0])
+        materials = self.spec_group_to_dict(spec_groups[1])
+        size = spec_groups[2].css('.pr-Spec_Item :not(h4)::text').getall()
         function = spec_groups[3]
-        case_materials = self.get_case_materials(materials)
-        glass = response.css('#innerExterior > div:nth-child(2) > div > p::text').get()
+
+        case_materials = self.translate_materials(materials['composition_du_boitier'])
 
         infos.image_urls = image if type(image) is list else [image]
-        infos.movement = self.get_movement(movement)
-        infos.diameter = int(self.get_diameter(diameter).split('.')[0])
+        infos.movement = self.get_movement(movement['type_de_mouvement'])
+        infos.caliber = movement['numero_du_calibre']
+        infos.power = self.get_power(movement)
         infos.case_materials = case_materials
-        infos.glass = glass
-
-        strap_materials = self.get_strap_materials(materials)
-        if strap_materials is not None:
-            infos.strap_materials = [strap_materials]
-        else:
-            infos.strap_materials = case_materials
+        infos.glass = self.get_glass(materials['composition_du_verre'])
+        infos.strap_materials = self.translate_materials(materials['matiere_du_bracelet'])\
+            if 'matiere_du_bracelet' in materials else case_materials
         infos.functions = self.get_function(function)
+        Logger.warn(size)
+        infos.diameter = self.get_diameter(size)
+        infos.thickness = self.get_thickness(size)
+
         yield infos.to_json()
 
-    def get_movement(self, selector):
-        tmp = selector.css('#innerMovement').css('.pr-Spec_Item')[1].css('p::text').get().lower()
+    def spec_group_to_dict(self, group, selector='p::text'):
+        dict = {}
+        spec_items = group.css('.pr-Spec_Item')
 
-        if tmp.find('spring drive') != -1:
+        for item in spec_items:
+            key = format_key(item.css('h4::text').get())
+            value = item.css('p::text').get().lower()
+            dict[key] = value
+        return dict
+
+    def get_power(self, movement) -> int:
+        if 'autonomie' in movement:
+            return movement['autonomie']
+        return 0
+
+    def translate_gender(self, gender: str):
+        if gender == 'Homme':
+            return MALE
+        return FEMALE
+
+    def get_glass(self, glass: str):
+        if glass.lower().find('hardlex') != -1:
+            return HARDLEX
+        return SAPHIR
+
+    def translate_materials(self, material: str):
+        lowercase_material = material.lower()
+        if lowercase_material.find('acier inoxydable') != -1:
+            return STAINLESS_STEEL
+        elif lowercase_material.find('cuir Cordovan') != -1:
+            return CORDOVAN_LEATHER
+        elif lowercase_material.find('cuir de Crocodile') != -1:
+            return CROCODILE_LEATHER
+        return STAINLESS_STEEL
+
+    def get_movement(self, movement_type: str):
+        if movement_type.find('spring drive') != -1:
             return AUTOMATIC
-        elif tmp.find('solaire') != -1:
+        elif movement_type.find('solaire') != -1:
             return SOLAR
         return AUTOMATIC
 
-    def get_diameter(self, selector):
-        return selector.css('.pr-Spec_Item').css('.pr-Spec_Text div::text').getall()[1]
+    def get_diameter(self, values: list):
+        for i in range(len(values)):
+            if values[i].find('Diamètre') != -1:
+                return int(values[i + 1].split('.')[0])
+        return 0
 
-    def get_case_materials(self, selector):
-        str_arr = selector.css('*::text').getall()[2].split(' et ')
-        materials = []
-
-        if len(str_arr) == 2:
-            materials.append(str_arr[0])
-            materials.append(str_arr[1])
-        else:
-            materials.append(str_arr[0])
-        return materials
-
-    def get_strap_materials(self, selector):
-        str_arr = selector.css('*::text').getall()
-
-        for idx, val in enumerate(str_arr):
-            if val.find('Matière du bracelet') != -1:
-                return str_arr[idx + 1]
-        return None
+    def get_thickness(self, values: list):
+        for i in range(len(values)):
+            if values[i].find('Épaisseur') != -1:
+                return int(values[i + 1].split('.')[0])
+        return 0
 
     def get_function(self, selector):
-        tmp = selector.css('*::text').getall()
+        tmp = selector.css(':not(h3)::text').getall()
         functions = [HOURS_MINUTES]
 
         for item in tmp[1:len(tmp)]:
@@ -114,4 +142,6 @@ class SeikoSpider(scrapy.Spider):
                 functions.append(DAY_DATE)
             elif string.find('affichage de la date') != -1:
                 functions.append(DATE)
+            elif string.find('affichage de la réserve de marche') != -1:
+                functions.append(POWER_RESERVE)
         return functions

@@ -12,13 +12,38 @@ class WatchSpecs:
     __case_form: str = 'Round'
     __glass: str = None
     __url: str = None
+    __power: int = 0
+    __caliber: str = None
+    __weight: str = None
+    __thickness: int = None
+    __case_materials: str = None
+    __strap_materials: str = None
+    __water_proofing_bars: str = int
     __image_urls: list = []
-    __case_materials: list = []
-    __strap_materials: list = []
     __functions: list = []
     __dial_colors: list = []
     __strap_colors: list = []
     __bezel_colors: list = []
+
+    @property
+    def thickness(self):
+        return self.__thickness
+
+    @property
+    def water_proofing_bars(self):
+        return self.__water_proofing_bars
+
+    @property
+    def weight(self):
+        return self.__weight
+
+    @property
+    def caliber(self):
+        return self.__caliber
+
+    @property
+    def power(self):
+        return self.__power
 
     @property
     def brand(self):
@@ -88,6 +113,41 @@ class WatchSpecs:
     def bezel_colors(self):
         return self.__bezel_colors
 
+    @thickness.setter
+    def thickness(self, thickness: int):
+        if type(thickness) is int:
+            self.__thickness = thickness
+        else:
+            Logger.warn('thickness property should be an int type.')
+
+    @water_proofing_bars.setter
+    def water_proofing_bars(self, water_proofing_bars: int):
+        if type(water_proofing_bars) is int:
+            self.__water_proofing_bars = water_proofing_bars
+        else:
+            Logger.warn('water_proofing_bars property should be an int type.')
+
+    @weight.setter
+    def weight(self, weight: int):
+        if type(weight) is int:
+            self.__weight = weight
+        else:
+            Logger.warn('weight property should be an int type.')
+
+    @caliber.setter
+    def caliber(self, caliber: str):
+        if type(caliber) is str:
+            self.__caliber = caliber
+        else:
+            Logger.warn('caliber property should be an str type.')
+
+    @power.setter
+    def power(self, power: int):
+        if type(power) is int:
+            self.__power = power
+        else:
+            Logger.warn('power property should be an int type')
+
     @brand.setter
     def brand(self, brand: str):
         if type(brand) is str:
@@ -138,18 +198,18 @@ class WatchSpecs:
             Logger.warn('functions property should be a list type.')
 
     @strap_materials.setter
-    def strap_materials(self, strap_materials: list):
-        if type(strap_materials) is list:
+    def strap_materials(self, strap_materials: str):
+        if type(strap_materials) is str:
             self.__strap_materials = strap_materials
         else:
-            Logger.warn('strap_materials property should be a list type.')
+            Logger.warn('strap_materials property should be an str type.')
 
     @case_materials.setter
-    def case_materials(self, case_materials: list):
-        if type(case_materials) is list:
+    def case_materials(self, case_materials: str):
+        if type(case_materials) is str:
             self.__case_materials = case_materials
         else:
-            Logger.warn('case_materials property should be a list type.')
+            Logger.warn('case_materials property should be an str type.')
 
     @case_form.setter
     def case_form(self, case_form: str):
@@ -216,6 +276,10 @@ class WatchSpecs:
             'movement': self.movement,
             'diameter': self.diameter,
             'name': self.name,
+            'power': self.power,
+            'thickness': self.thickness,
+            'caliber': self.caliber,
+            'weight': self.weight,
             'image_urls': self.image_urls,
             'case_form': self.case_form,
             'case_materials': self.case_materials,
