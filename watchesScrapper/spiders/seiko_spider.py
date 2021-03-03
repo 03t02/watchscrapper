@@ -1,12 +1,12 @@
 import scrapy
 from watchesScrapper.src.logger import Logger
 from watchesScrapper.src.utils import generate_default_dict, price_to_int \
-    ,format_key
+    ,format_key, get_int
 from watchesScrapper.src.watch_specs import WatchSpecs
 from watchesScrapper.src.constant import HOURS_MINUTES, DATE, DAY, DAY_DATE \
     ,ALARM, CHRONOGRAPH, SECOND_TIMEZONE, AUTOMATIC, SOLAR, MALE, FEMALE \
     ,SAPHIR, STAINLESS_STEEL, HARDLEX, CORDOVAN_LEATHER, CROCODILE_LEATHER\
-    ,POWER_RESERVE
+    ,POWER_RESERVE, TITANIUM
 
 
 class SeikoSpider(scrapy.Spider):
@@ -55,18 +55,16 @@ class SeikoSpider(scrapy.Spider):
         size = spec_groups[2].css('.pr-Spec_Item :not(h4)::text').getall()
         function = spec_groups[3]
 
-        case_materials = self.translate_materials(materials['composition_du_boitier'])
-
         infos.image_urls = image if type(image) is list else [image]
         infos.movement = self.get_movement(movement['type_de_mouvement'])
         infos.caliber = movement['numero_du_calibre']
         infos.power = self.get_power(movement)
-        infos.case_materials = case_materials
+        infos.case_material = self.translate_materials(materials['composition_du_boitier'])\
+            if 'composition_du_boitier' in materials else ''
         infos.glass = self.get_glass(materials['composition_du_verre'])
-        infos.strap_materials = self.translate_materials(materials['matiere_du_bracelet'])\
-            if 'matiere_du_bracelet' in materials else case_materials
+        infos.strap_material = self.translate_materials(materials['matiere_du_bracelet'])\
+            if 'matiere_du_bracelet' in materials else ''
         infos.functions = self.get_function(function)
-        Logger.warn(size)
         infos.diameter = self.get_diameter(size)
         infos.thickness = self.get_thickness(size)
 
@@ -84,7 +82,8 @@ class SeikoSpider(scrapy.Spider):
 
     def get_power(self, movement) -> int:
         if 'autonomie' in movement:
-            return movement['autonomie']
+            Logger.warn('Power: ' + str(get_int(movement['autonomie'])))
+            return get_int(movement['autonomie'])
         return 0
 
     def translate_gender(self, gender: str):
@@ -101,10 +100,12 @@ class SeikoSpider(scrapy.Spider):
         lowercase_material = material.lower()
         if lowercase_material.find('acier inoxydable') != -1:
             return STAINLESS_STEEL
-        elif lowercase_material.find('cuir Cordovan') != -1:
+        elif lowercase_material.find('cuir cordovan') != -1:
             return CORDOVAN_LEATHER
-        elif lowercase_material.find('cuir de Crocodile') != -1:
+        elif lowercase_material.find('cuir de crocodile') != -1:
             return CROCODILE_LEATHER
+        elif lowercase_material.find('titane') != -1:
+            return TITANIUM
         return STAINLESS_STEEL
 
     def get_movement(self, movement_type: str):

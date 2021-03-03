@@ -26,5 +26,6 @@ HARDLEX: str = 'Hardlex'
 
 # Strap & Case materials
 STAINLESS_STEEL: str = 'Stainless steel'
+TITANIUM: str = 'Titanium'
 CORDOVAN_LEATHER: str = 'Cordovan leather'
 CROCODILE_LEATHER: str = 'Crocodile leather'

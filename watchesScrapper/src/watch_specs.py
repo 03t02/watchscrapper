@@ -2,28 +2,28 @@ from watchesScrapper.src.logger import Logger
 
 
 class WatchSpecs:
-    __brand: str = None
-    __reference: str = None
-    __price: int = None
-    __gender: str = None
+    __brand: str = ''
+    __reference: str = ''
+    __price: int = 0
+    __gender: str = ''
     __movement: str = 'Automatic'
     __diameter: int = 0
-    __name: str = None
+    __name: str = ''
     __case_form: str = 'Round'
-    __glass: str = None
-    __url: str = None
+    __glass: str = ''
+    __url: str = ''
     __power: int = 0
-    __caliber: str = None
-    __weight: str = None
-    __thickness: int = None
-    __case_materials: str = None
-    __strap_materials: str = None
-    __water_proofing_bars: str = int
+    __caliber: str = ''
+    __weight: str = ''
+    __thickness: int = 0
+    __case_material: str = ''
+    __strap_material: str = ''
+    __dial_color: str = ''
+    __strap_color: str = ''
+    __bezel_color: str = ''
+    __water_proofing_bars: int = 0
     __image_urls: list = []
     __functions: list = []
-    __dial_colors: list = []
-    __strap_colors: list = []
-    __bezel_colors: list = []
 
     @property
     def thickness(self):
@@ -82,12 +82,12 @@ class WatchSpecs:
         return self.__case_form
 
     @property
-    def case_materials(self):
-        return self.__case_materials
+    def case_material(self):
+        return self.__case_material
 
     @property
-    def strap_materials(self):
-        return self.__strap_materials
+    def strap_material(self):
+        return self.__strap_material
 
     @property
     def functions(self):
@@ -102,16 +102,16 @@ class WatchSpecs:
         return self.__url
 
     @property
-    def dial_colors(self):
-        return self.__dial_colors
+    def dial_color(self):
+        return self.__dial_color
 
     @property
-    def strap_colors(self):
-        return self.__strap_colors
+    def strap_color(self):
+        return self.__strap_color
 
     @property
-    def bezel_colors(self):
-        return self.__bezel_colors
+    def bezel_color(self):
+        return self.__bezel_color
 
     @thickness.setter
     def thickness(self, thickness: int):
@@ -155,26 +155,26 @@ class WatchSpecs:
         else:
             Logger.warn('brand property should be an str type.')
 
-    @strap_colors.setter
-    def strap_colors(self, strap_colors: list):
-        if type(strap_colors) is list:
-            self.__strap_colors = strap_colors
+    @strap_color.setter
+    def strap_color(self, strap_color: str):
+        if type(strap_color) is str:
+            self.__strap_color = strap_color
         else:
-            Logger.warn('strap_colors property should be a list type.')
+            Logger.warn('strap_color property should be a str type.')
 
-    @bezel_colors.setter
-    def bezel_colors(self, bezel_colors: list):
-        if type(bezel_colors) is list:
-            self.__bezel_colors = bezel_colors
+    @bezel_color.setter
+    def bezel_color(self, bezel_color: str):
+        if type(bezel_color) is str:
+            self.__bezel_color = bezel_color
         else:
-            Logger.warn('bezel_colors property should be a list type.')
+            Logger.warn('bezel_color property should be an str type.')
 
-    @dial_colors.setter
-    def dial_colors(self, dial_colors: list):
-        if type(dial_colors) is list:
-            self.__dial_colors = dial_colors
+    @dial_color.setter
+    def dial_color(self, dial_color: str):
+        if type(dial_color) is str:
+            self.__dial_color = dial_color
         else:
-            Logger.warn('dial_colors property should be a list type.')
+            Logger.warn('dial_color property should be an str type.')
 
     @url.setter
     def url(self, url: str):
@@ -197,19 +197,19 @@ class WatchSpecs:
         else:
             Logger.warn('functions property should be a list type.')
 
-    @strap_materials.setter
-    def strap_materials(self, strap_materials: str):
-        if type(strap_materials) is str:
-            self.__strap_materials = strap_materials
+    @strap_material.setter
+    def strap_material(self, strap_material: str):
+        if type(strap_material) is str:
+            self.__strap_material = strap_material
         else:
-            Logger.warn('strap_materials property should be an str type.')
+            Logger.warn('strap_material property should be an str type.')
 
-    @case_materials.setter
-    def case_materials(self, case_materials: str):
-        if type(case_materials) is str:
-            self.__case_materials = case_materials
+    @case_material.setter
+    def case_material(self, case_material: str):
+        if type(case_material) is str:
+            self.__case_material = case_material
         else:
-            Logger.warn('case_materials property should be an str type.')
+            Logger.warn('case_material property should be an str type.')
 
     @case_form.setter
     def case_form(self, case_form: str):
@@ -282,12 +282,12 @@ class WatchSpecs:
             'weight': self.weight,
             'image_urls': self.image_urls,
             'case_form': self.case_form,
-            'case_materials': self.case_materials,
-            'strap_materials': self.strap_materials,
+            'case_material': self.case_material,
+            'strap_material': self.strap_material,
             'functions': self.functions,
             'glass': self.glass,
             'url': self.url,
-            'dial_colors': self.dial_colors,
-            'strap_colors': self.strap_colors,
-            'bezel_colors': self.bezel_colors
+            'dial_color': self.dial_color,
+            'strap_color': self.strap_color,
+            'bezel_color': self.bezel_color
         }

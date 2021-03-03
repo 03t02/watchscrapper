@@ -31,3 +31,26 @@ def no_utf8(string: str) -> str:
 
 def format_key(key: str) -> str:
     return no_utf8(key.replace(' ', '_')).lower() or 'default_key'
+
+
+def get_int(string: str) -> int:
+    chunks: list = string.split(' ')
+    for chunk in chunks:
+        if chunk.isdigit():
+            return int(chunk)
+    return 0
+
+
+def get_dict_keys(obj: dict) -> list[str]:
+    return list(obj.keys())
+
+
+def snake_case_to_camel_case(string: str) -> str:
+    arr_str: list[str] = list(string)
+
+    for idx, new_str in enumerate(arr_str):
+        if new_str == '_':
+            arr_str[idx + 1] = arr_str[idx + 1].capitalize()
+            del arr_str[idx]
+    return arr_str
+
