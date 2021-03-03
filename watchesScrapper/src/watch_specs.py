@@ -289,5 +289,6 @@ class WatchSpecs:
             'url': self.url,
             'dial_color': self.dial_color,
             'strap_color': self.strap_color,
-            'bezel_color': self.bezel_color
+            'bezel_color': self.bezel_color,
+            'water_proofing': self.water_proofing_bars
         }
