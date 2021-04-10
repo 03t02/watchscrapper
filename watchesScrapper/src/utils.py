@@ -1,3 +1,6 @@
+from logger import Logger
+
+
 def generate_default_dict(brand: str, case_form='Round', movement='Automatic') -> dict:
     return {
         'brand': brand,
