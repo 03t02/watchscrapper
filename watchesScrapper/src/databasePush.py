@@ -1,8 +1,8 @@
 import json_lines
 import mysql.connector
 from mysql.connector import errorcode
-from utils import query_builder, dict_key_camel_case
-from logger import Logger
+from watchesScrapper.src.utils import query_builder, dict_key_camel_case
+from watchesScrapper.src.logger import Logger
 
 
 try:

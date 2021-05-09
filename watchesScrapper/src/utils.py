@@ -1,4 +1,4 @@
-from logger import Logger
+from watchesScrapper.src.logger import Logger
 
 
 def generate_default_dict(brand: str, case_form='Round', movement='Automatic') -> dict:
